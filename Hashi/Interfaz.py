@@ -52,7 +52,6 @@ class Interfaz:
         for (i1, j1), (i2, j2) in self.tablero.conexiones:
             self._dibujar_puente(i1, j1, i2, j2, self.tablero.conexiones[((i1, j1), (i2, j2))])
 
-
     def _dibujar_puente(self, x1, y1, x2, y2, cantidad):
         # Posición de los centros de las islas
         cx1, cy1 = y1 * self.cell_size + self.cell_size // 2, x1 * self.cell_size + self.cell_size // 2
@@ -85,13 +84,14 @@ class Interfaz:
                     try:
                         # Intenta agregar el puente
                         self.tablero.agregar_puente(self.selected_isla, isla)
-                        
+
                         # Si el puente se agregó correctamente, reinicia la selección
                         self.selected_isla = None
                     except ValueError as e:
                         # Muestra el mensaje de error pero no actualizar la grilla
                         messagebox.showerror("Error de Conexión", f"No se puede conectar las islas: {e}")
                         # Mantiene la isla seleccionada para otro intento
+                        self.selected_isla = None
                         return
             else:
                 # Selecciona la primera isla

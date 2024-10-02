@@ -7,7 +7,7 @@ from tkinter import simpledialog, messagebox
 def main():
     root = tk.Tk()
     root.withdraw()
-    
+
     # Pregunta si el usuario quiere un jugador humano o sintético
     tipo_jugador = simpledialog.askstring("Tipo de Jugador", "¿Desea jugar como Humano o Sintético? (h/s)").lower()
 
@@ -16,7 +16,7 @@ def main():
         print("Opción no válida. Cerrando el juego.")
         return
 
-    ruta_archivo = 'tablero1.txt'
+    ruta_archivo = 'tablero2.txt'
 
     # Si el jugador es humano se comienza a jugar
     if tipo_jugador == "h":
@@ -29,7 +29,7 @@ def main():
         interfaz.iniciar_interfaz()
     elif tipo_jugador == "s": # En cambio, si el jugador es sintético juega automáticamente
         # Se debe hacer la lógica para el jugador sintético
-        print("Jugador sintético seleccionado.")
+        messagebox.showinfo("Jugador sintético","Jugador sintético seleccionado.")
 
 if __name__ == "__main__":
     main()
