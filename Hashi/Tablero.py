@@ -39,16 +39,6 @@ class Tablero:
 
         return tablero_expandido
 
-    def mostrar_tablero(self):
-        for fila in self.tablero_expandido:
-            fila_str = ""
-            for celda in fila:
-                if celda == '||':
-                    fila_str += celda
-                else:
-                    fila_str += f"{celda} "
-            print(fila_str)
-
     def obtener_isla(self, x, y):
         for isla in self.islas:
             if isla.x == x and isla.y == y:
@@ -56,22 +46,36 @@ class Tablero:
         return None
 
     def validar_conexion(self, isla1, isla2):
-        if isla1.x == isla2.x: 
+        filas = len(self.tablero)  # Número de filas en el tablero original
+        columnas = len(self.tablero[0])  # Número de columnas en el tablero original
+
+        if isla1.x == isla2.x:  # Conexión horizontal
             for j in range(min(isla1.y, isla2.y) * 2 + 1, max(isla1.y, isla2.y) * 2, 2):
                 if self.tablero_expandido[isla1.x * 2][j] not in (' ', '-', '='):
                     return False
-        elif isla1.y == isla2.y: 
+
+            for i in range(filas * 2 - 1):
+                if self.tablero_expandido[i][(min(isla1.y, isla2.y) + max(isla1.y, isla2.y)) // 2 * 2] in ('|', '||'):
+                    return False
+
+        elif isla1.y == isla2.y:  # Conexión vertical
             for i in range(min(isla1.x, isla2.x) * 2 + 1, max(isla1.x, isla2.x) * 2, 2):
                 if self.tablero_expandido[i][isla1.y * 2] not in (' ', '|', '||'):
                     return False
+
+            for j in range(columnas * 2 - 1):
+                if self.tablero_expandido[(min(isla1.x, isla2.x) + max(isla1.x, isla2.x)) // 2 * 2][j] in ('-', '='):
+                    return False
+
         else:
             return False
 
-        if isla1.x == isla2.x: 
+        # Verificar que no haya islas en el camino en el tablero original
+        if isla1.x == isla2.x:  # Conexión horizontal en el tablero original
             for j in range(min(isla1.y, isla2.y) + 1, max(isla1.y, isla2.y)):
                 if self.tablero[isla1.x][j] != 0:
                     return False
-        elif isla1.y == isla2.y:  
+        elif isla1.y == isla2.y:  # Conexión vertical en el tablero original
             for i in range(min(isla1.x, isla2.x) + 1, max(isla1.x, isla2.x)):
                 if self.tablero[i][isla1.y] != 0:
                     return False
@@ -79,58 +83,45 @@ class Tablero:
         return True
     
     def agregar_puente(self, isla1, isla2):
+        """
+        Agrega un puente entre dos islas si es una conexión válida.
+        """
+        # Primero, validar la conexión
         if not self.validar_conexion(isla1, isla2):
             raise ValueError("No se puede conectar las islas debido a una obstrucción o alineación incorrecta.")
         
+        # Crear el par ordenado de islas para representar la conexión
         par_islas = tuple(sorted([(isla1.x, isla1.y), (isla2.x, isla2.y)]))
         
+        # Verificar si ya hay dos puentes conectando estas dos islas
         if self.conexiones.get(par_islas, 0) >= 2:
             raise ValueError("No se pueden agregar más de dos conexiones entre dos islas.")
-        
+
+        # Verificar si alguna de las islas excede el número de conexiones permitidas
+        if isla1.conexiones_actuales >= isla1.conexiones_necesarias or isla2.conexiones_actuales >= isla2.conexiones_necesarias:
+            raise ValueError("Una de las islas ya alcanzó su número máximo de conexiones.")
+
+        # Si la validación pasa, agregar el puente
         self.conexiones[par_islas] = self.conexiones.get(par_islas, 0) + 1
         
+        # Actualizar el número de conexiones de cada isla
         isla1.agregar_conexion()
         isla2.agregar_conexion()
         
-        if isla1.x == isla2.x: 
+        # Dibujar el puente en la grilla expandida
+        if isla1.x == isla2.x:  # Conexión horizontal
             for j in range(min(isla1.y, isla2.y) * 2 + 1, max(isla1.y, isla2.y) * 2, 2):
                 if self.tablero_expandido[isla1.x * 2][j] == ' ':
                     self.tablero_expandido[isla1.x * 2][j] = '-'
                 elif self.tablero_expandido[isla1.x * 2][j] == '-':
                     self.tablero_expandido[isla1.x * 2][j] = '='
-        elif isla1.y == isla2.y: 
+        elif isla1.y == isla2.y:  # Conexión vertical
             for i in range(min(isla1.x, isla2.x) * 2 + 1, max(isla1.x, isla2.x) * 2, 2):
                 if self.tablero_expandido[i][isla1.y * 2] == ' ':
                     self.tablero_expandido[i][isla1.y * 2] = '|'
                 elif self.tablero_expandido[i][isla1.y * 2] == '|':
                     self.tablero_expandido[i][isla1.y * 2] = '||'
 
-    def quitar_puente(self, isla1, isla2):
-        if not self.validar_conexion(isla1, isla2):
-            raise ValueError("No hay puente entre las islas para quitar.")
-        
-        par_islas = tuple(sorted([(isla1.x, isla1.y), (isla2.x, isla2.y)]))
-        
-        if self.conexiones.get(par_islas, 0) == 0:
-            raise ValueError("No hay conexiones actuales entre las islas para quitar.")
-        
-        self.conexiones[par_islas] -= 1
-        
-        isla1.quitar_conexion()
-        isla2.quitar_conexion()
-        
-        if isla1.x == isla2.x: 
-            for j in range(min(isla1.y, isla2.y) * 2 + 1, max(isla1.y, isla2.y) * 2, 2):
-                if self.tablero_expandido[isla1.x * 2][j] == '=':
-                    self.tablero_expandido[isla1.x * 2][j] = '-'
-                elif self.tablero_expandido[isla1.x * 2][j] == '-':
-                    self.tablero_expandido[isla1.x * 2][j] = ' '
-        elif isla1.y == isla2.y: 
-            for i in range(min(isla1.x, isla2.x) * 2 + 1, max(isla1.x, isla2.x) * 2, 2):
-                if self.tablero_expandido[i][isla1.y * 2] == '||':
-                    self.tablero_expandido[i][isla1.y * 2] = '|'
-                elif self.tablero_expandido[i][isla1.y * 2] == '|':
-                    self.tablero_expandido[i][isla1.y * 2] = ' '
 
     def verificar_ganador(self):
         return all(isla.esta_completa() for isla in self.islas)

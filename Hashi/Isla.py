@@ -10,7 +10,7 @@ class Isla:
             self.conexiones_actuales += 1
         else:
             raise ValueError("Número máximo de conexiones alcanzado")
-        
+
     def quitar_conexion(self):
         if self.conexiones_actuales > 0:
             self.conexiones_actuales -= 1
