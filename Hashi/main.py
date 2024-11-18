@@ -16,7 +16,7 @@ def main():
         print("Opción no válida. Cerrando el juego.")
         return
 
-    ruta_archivo = 'tablero2.txt'
+    ruta_archivo = 'tablero1.txt'
 
     # Si el jugador es humano se comienza a jugar
     if tipo_jugador == "h":
