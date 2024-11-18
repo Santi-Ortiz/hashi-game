@@ -72,7 +72,8 @@ class Tablero:
             raise ValueError("No se puede conectar las islas debido a una obstrucción o alineación incorrecta.")
 
         if isla1.conexiones_actuales >= isla1.conexiones_necesarias or isla2.conexiones_actuales >= isla2.conexiones_necesarias:
-            raise ValueError("Una de las islas ya alcanzó su número máximo de conexiones.")
+            self.eliminar_puente(isla1, isla2)
+            return
 
         if conexiones_actuales < 2:
             self.conexiones[par_islas] = self.conexiones.get(par_islas, 0) + 1
@@ -146,3 +147,16 @@ class Tablero:
         if not self.verificar_conectividad():
             return False
         return True
+
+    def son_vecinos(self, isla1, isla2):
+        if isla1.x == isla2.x:
+            for j in range(min(isla1.y, isla2.y) + 1, max(isla1.y, isla2.y)):
+                if self.tablero[isla1.x][j] != 0:
+                    return False
+            return True
+        elif isla1.y == isla2.y:
+            for i in range(min(isla1.x, isla2.x) + 1, max(isla1.x, isla2.x)):
+                if self.tablero[i][isla1.y] != 0:
+                    return False
+            return True
+        return False

@@ -16,7 +16,7 @@ def main():
         print("Opción no válida. Cerrando el juego.")
         return
 
-    ruta_archivo = 'tablero1.txt'
+    ruta_archivo = 'tablero0.txt'
 
     # Si el jugador es humano se comienza a jugar
     if tipo_jugador == "h":
@@ -27,9 +27,24 @@ def main():
         tablero = Tablero(ruta_archivo)
         interfaz = Interfaz(tablero, jugador)
         interfaz.iniciar_interfaz()
-    elif tipo_jugador == "s": # En cambio, si el jugador es sintético juega automáticamente
-        # Se debe hacer la lógica para el jugador sintético
-        messagebox.showinfo("Jugador sintético","Jugador sintético seleccionado.")
 
+    elif tipo_jugador == "s":  # En cambio, si el jugador es sintético juega automáticamente
+        es_sintetico = True
+        nombre = "Jugador Sintético"
+        jugador = Jugador(nombre, es_sintetico)
+        tablero = Tablero(ruta_archivo)
+        interfaz = Interfaz(tablero, jugador)
+
+        # Jugar automáticamente
+        while not tablero.verificar_ganador():
+            jugador.jugar_auto(tablero)
+            interfaz.dibujar_grilla()
+            if not tablero.verificar_ganador():
+                break
+
+        if tablero.verificar_ganador():
+            messagebox.showinfo("¡Victoria!", f"Felicidades, ¡has ganado el juego!")
+        else:
+            messagebox.showinfo("Fin del juego", "No se encontró una solución.")
 if __name__ == "__main__":
     main()
