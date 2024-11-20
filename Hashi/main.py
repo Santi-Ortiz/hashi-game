@@ -16,11 +16,10 @@ def main():
         print("Opción no válida. Cerrando el juego.")
         return
 
-    ruta_archivo = 'tablero3.txt'
+    ruta_archivo = 'tablero1.txt'
 
     # Si el jugador es humano se comienza a jugar
     if tipo_jugador == "h":
-        # Se instancian los objetos para inicializar el juego en este caso tablero, jugador e interfaz
         es_sintetico = False
         nombre = simpledialog.askstring("Nombre", "Ingrese su nombre:")
         jugador = Jugador(nombre, es_sintetico)
@@ -28,7 +27,7 @@ def main():
         interfaz = Interfaz(tablero, jugador)
         interfaz.iniciar_interfaz()
 
-    elif tipo_jugador == "s":  # En cambio, si el jugador es sintético juega automáticamente
+    elif tipo_jugador == "s":
         es_sintetico = True
         nombre = "Jugador Sintético"
         jugador = Jugador(nombre, es_sintetico)
