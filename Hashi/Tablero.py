@@ -51,12 +51,23 @@ class Tablero:
             for j in range(min(isla1.y, isla2.y) * 2 + 1, max(isla1.y, isla2.y) * 2, 2):
                 if self.tablero_expandido[isla1.x * 2][j] not in (' ', '-', '='):
                     return False
+
         elif isla1.y == isla2.y:
             for i in range(min(isla1.x, isla2.x) * 2 + 1, max(isla1.x, isla2.x) * 2, 2):
                 if self.tablero_expandido[i][isla1.y * 2] not in (' ', '|', '||'):
                     return False
         else:
             return False
+
+        if isla1.x == isla2.x:
+            for j in range(min(isla1.y, isla2.y) + 1, max(isla1.y, isla2.y)):
+                if self.tablero[isla1.x][j] not in (0, '-'):
+                    return False
+
+        elif isla1.y == isla2.y:
+            for i in range(min(isla1.x, isla2.x) + 1, max(isla1.x, isla2.x)):
+                if self.tablero[i][isla1.y] not in (0, '|'):
+                    return False
 
         return True
 
@@ -68,30 +79,36 @@ class Tablero:
             self.eliminar_puente(isla1, isla2)
             return
 
-        if not self.validar_conexion(isla1, isla2):
-            raise ValueError("No se puede conectar las islas debido a una obstrucción o alineación incorrecta.")
-
         if isla1.conexiones_actuales >= isla1.conexiones_necesarias or isla2.conexiones_actuales >= isla2.conexiones_necesarias:
             self.eliminar_puente(isla1, isla2)
             return
+
+        if not self.validar_conexion(isla1, isla2):
+            raise ValueError("No se puede conectar las islas debido a una obstrucción o alineación incorrecta.")
 
         if conexiones_actuales < 2:
             self.conexiones[par_islas] = self.conexiones.get(par_islas, 0) + 1
             isla1.agregar_conexion()
             isla2.agregar_conexion()
 
-            if isla1.x == isla2.x:
+            if isla1.x == isla2.x:  # Conexión horizontal
                 for j in range(min(isla1.y, isla2.y) * 2 + 1, max(isla1.y, isla2.y) * 2, 2):
                     if self.tablero_expandido[isla1.x * 2][j] == ' ':
                         self.tablero_expandido[isla1.x * 2][j] = '-'
                     elif self.tablero_expandido[isla1.x * 2][j] == '-':
                         self.tablero_expandido[isla1.x * 2][j] = '='
-            elif isla1.y == isla2.y:
+                    if self.tablero[isla1.x][j // 2] == 0:
+                        self.tablero[isla1.x][j // 2] = '-'
+            elif isla1.y == isla2.y:  # Conexión vertical
                 for i in range(min(isla1.x, isla2.x) * 2 + 1, max(isla1.x, isla2.x) * 2, 2):
                     if self.tablero_expandido[i][isla1.y * 2] == ' ':
                         self.tablero_expandido[i][isla1.y * 2] = '|'
                     elif self.tablero_expandido[i][isla1.y * 2] == '|':
                         self.tablero_expandido[i][isla1.y * 2] = '||'
+                    if self.tablero[i // 2][isla1.y] == 0:
+                        self.tablero[i // 2][isla1.y] = '|'
+            else:
+                raise ValueError("Número máximo de conexiones alcanzado")
 
     def eliminar_puente(self, isla1, isla2):
         par_islas = tuple(sorted([(isla1.x, isla1.y), (isla2.x, isla2.y)]))
